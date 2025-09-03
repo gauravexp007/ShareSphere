@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareSphere - Resource Sharing Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark);
+            min-height: 100vh;
+        }
+
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-icon {
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 1rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 3rem;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            animation: modalFadeIn 0.5s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        footer {
+            background: var(--dark);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: left;
+        }
+
+        .footer-section h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+
+        .share-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s ease;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .features {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+        }
+
+        /* Dashboard styles */
+        .dashboard {
+            display: none;
+        }
+
+        .search-bar {
+            display: flex;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 50px;
+            padding: 0.3rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+        }
+
+        .search-bar input:focus {
+            outline: none;
+        }
+
+        .search-bar button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 0.8rem 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .resource-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .resource-img {
+            height: 180px;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+
+        .resource-content {
+            padding: 1.5rem;
+        }
+
+        .resource-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .resource-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .resource-price {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .profile-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            margin-right: 1.5rem;
+        }
+
+        .profile-info h2 {
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-info p {
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <div class="logo">
+                <span class="logo-icon">🔄</span>
+                ShareSphere
+            </div>
+            <div class="nav-links">
+                <a href="#" class="active">Home</a>
+                <a href="#" id="resources-link">Resources</a>
+                <a href="#" id="profile-link">Profile</a>
+                <a href="#" id="login-btn">Login</a>
+                <a href="#" id="register-btn">Register</a>
+                <a href="#" id="logout-btn" style="display: none;">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Share Resources, Create Connections</h1>
+            <p>ShareSphere is a platform where you can share your resources with others or find resources you need. Join our community today!</p>
+            <a href="#" class="btn btn-primary" id="hero-register-btn">Get Started</a>
+        </div>
+
+        <div class="features">
+            <div class="feature-card">
+                <div class="feature-icon">🔍</div>
+                <h3>Find Resources</h3>
+                <p>Search for resources you need in your local area and book them instantly.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Earn Money</h3>
+                <p>Share your idle resources and earn money when others use them.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌎</div>
+                <h3>Eco-Friendly</h3>
+                <p>Reduce waste by sharing resources instead of everyone owning everything.</p>
+            </div>
+        </div>
+
+        <div class="dashboard" id="dashboard">
+            <div class="search-bar">
+                <input type="text" placeholder="Search for resources..." id="search-input">
+                <button id="search-btn">Search</button>
+            </div>
+
+            <div class="resources-grid" id="resources-grid">
+                <!-- Resources will be loaded here -->
+            </div>
+
+            <div class="profile-section" id="profile-section" style="display: none;">
+                <div class="profile-header">
+                    <div class="profile-avatar" id="profile-avatar">U</div>
+                    <div class="profile-info">
+                        <h2 id="profile-name">User Name</h2>
+                        <p id="profile-location">Location not set</p>
+                    </div>
+                </div>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number</label>
+                        <input type="tel" id="phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location</label>
+                        <input type="text" id="location" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Profile</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="share-btn" id="share-resource-btn">+</div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About ShareSphere</h3>
+                <p>ShareSphere is a resource sharing platform that connects people who have resources with those who need them.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <p><a href="#">Home</a></p>
+                <p><a href="#">How it works</a></p>
+                <p><a href="#">Privacy Policy</a></p>
+                <p><a href="#">Terms of Service</a></p>
+            </div>
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <p>Email: support@sharesphere.com</p>
+                <p>Phone: +1 (555) 123-4567</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Register Modal -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create Account</h2>
+                <span class="close-btn" id="close-register">&times;</span>
+            </div>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Full Name</label>
+                    <input type="text" id="register-name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Email</label>
+                    <input type="email" id="register-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-location">Location</label>
+                    <input type="text" id="register-location" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Password</label>
+                    <input type="password" id="register-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal" id="login-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Login</h2>
+                <span class="close-btn" id="close-login">&times;</span>
+            </div>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Email</label>
+                    <input type="email" id="login-email" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Share Resource Modal -->
+    <div class="modal" id="share-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Share a Resource</h2>
+                <span class="close-btn" id="close-share">&times;</span>
+            </div>
+            <form id="share-form">
+                <div class="form-group">
+                    <label for="resource-title">Resource Title</label>
+                    <input type="text" id="resource-title" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="resource-description">Description</label>
+                    <textarea id="resource-description" class="form-control" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="resource-price">Price per hour ($)</label>
+                    <input type="number" id="resource-price" class="form-control" min="0" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="resource-availability">Availability</label>
+                    <input type="text" id="resource-availability" class="form-control" placeholder="e.g., Weekdays 9am-5pm" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Share Resource</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="booking-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Resource</h2>
+                <span class="close-btn" id="close-booking">&times;</span>
+            </div>
+            <div id="booking-details">
+                <h3 id="booking-resource-title"></h3>
+                <p id="booking-resource-price"></p>
+                <p id="booking-resource-availability"></p>
+            </div>
+            <form id="booking-form">
+                <div class="form-group">
+                    <label for="booking-date">Select Date</label>
+                    <input type="date" id="booking-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-time">Select Time Slot</label>
+                    <input type="time" id="booking-time" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="booking-duration">Duration (hours)</label>
+                    <input type="number" id="booking-duration" class="form-control" min="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Proceed to Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div class="modal" id="payment-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Complete Payment</h2>
+                <span class="close-btn" id="close-payment">&times;</span>
+            </div>
+            <div id="payment-details">
+                <p>Total Amount: $<span id="payment-total">0</span></p>
+            </div>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <input type="text" id="card-number" class="form-control" placeholder="1234 5678 9012 3456" required>
+                </div>
+                <div class="form-group">
+                    <label for="card-expiry">Expiry Date</label>
+                    <input type="text" id="card-expiry" class="form-control" placeholder="MM/YY" required>
+                </div>
+                <div class="form-group">
+                    <label for="card-cvc">CVC</label>
+                    <input type="text" id="card-cvc" class="form-control" placeholder="123" required>
+                </div>
+                <div class="form-group">
+                    <label for="card-name">Name on Card</label>
+                    <input type="text" id="card-name" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Confirm Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Supabase initialization
+        const SUPABASE_URL = 'https://your-project.supabase.co';
+        const SUPABASE_ANON_KEY = 'your-anon-key';
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        // DOM Elements
+        const registerModal = document.getElementById('register-modal');
+        const loginModal = document.getElementById('login-modal');
+        const shareModal = document.getElementById('share-modal');
+        const bookingModal = document.getElementById('booking-modal');
+        const paymentModal = document.getElementById('payment-modal');
+        const dashboard = document.getElementById('dashboard');
+        const profileSection = document.getElementById('profile-section');
+        const resourcesGrid = document.getElementById('resources-grid');
+        
+        // Buttons
+        const registerBtn = document.getElementById('register-btn');
+        const loginBtn = document.getElementById('login-btn');
+        const heroRegisterBtn = document.getElementById('hero-register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const shareResourceBtn = document.getElementById('share-resource-btn');
+        const searchBtn = document.getElementById('search-btn');
+        const profileLink = document.getElementById('profile-link');
+        const resourcesLink = document.getElementById('resources-link');
+        
+        // Close buttons
+        const closeRegister = document.getElementById('close-register');
+        const closeLogin = document.getElementById('close-login');
+        const closeShare = document.getElementById('close-share');
+        const closeBooking = document.getElementById('close-booking');
+        const closePayment = document.getElementById('close-payment');
+        
+        // Forms
+        const registerForm = document.getElementById('register-form');
+        const loginForm = document.getElementById('login-form');
+        const shareForm = document.getElementById('share-form');
+        const bookingForm = document.getElementById('booking-form');
+        const paymentForm = document.getElementById('payment-form');
+        const profileForm = document.getElementById('profile-form');
+        
+        // User state
+        let currentUser = null;
+        let selectedResource = null;
+        
+        // Event Listeners
+        registerBtn.addEventListener('click', () => showModal(registerModal));
+        loginBtn.addEventListener('click', () => showModal(loginModal));
+        heroRegisterBtn.addEventListener('click', () => showModal(registerModal));
+        logoutBtn.addEventListener('click', handleLogout);
+        shareResourceBtn.addEventListener('click', () => showModal(shareModal));
+        searchBtn.addEventListener('click', handleSearch);
+        profileLink.addEventListener('click', showProfile);
+        resourcesLink.addEventListener('click', showResources);
+        
+        closeRegister.addEventListener('click', () => hideModal(registerModal));
+        closeLogin.addEventListener('click', () => hideModal(loginModal));
+        closeShare.addEventListener('click', () => hideModal(shareModal));
+        closeBooking.addEventListener('click', () => hideModal(bookingModal));
+        closePayment.addEventListener('click', () => hideModal(paymentModal));
+        
+        registerForm.addEventListener('submit', handleRegister);
+        loginForm.addEventListener('submit', handleLogin);
+        shareForm.addEventListener('submit', handleShareResource);
+        bookingForm.addEventListener('submit', handleBooking);
+        paymentForm.addEventListener('submit', handlePayment);
+        profileForm.addEventListener('submit', handleProfileUpdate);
+        
+        // Check if user is logged in on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthState();
+            loadResources();
+        });
+        
+        // Modal functions
+        function showModal(modal) {
+            modal.style.display = 'flex';
+        }
+        
+        function hideModal(modal) {
+            modal.style.display = 'none';
+        }
+        
+        // Auth functions
+        async function checkAuthState() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                currentUser = user;
+                updateUIForAuth();
+                loadUserProfile();
+            } else {
+                currentUser = null;
+                updateUIForUnauth();
+            }
+        }
+        
+        function updateUIForAuth() {
+            loginBtn.style.display = 'none';
+            registerBtn.style.display = 'none';
+            logoutBtn.style.display = 'block';
+            shareResourceBtn.style.display = 'flex';
+            dashboard.style.display = 'block';
+        }
+        
+        function updateUIForUnauth() {
+            loginBtn.style.display = 'block';
+            registerBtn.style.display = 'block';
+            logoutBtn.style.display = 'none';
+            shareResourceBtn.style.display = 'none';
+            dashboard.style.display = 'none';
+        }
+        
+        async function handleRegister(e) {
+            e.preventDefault();
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const phone = document.getElementById('register-phone').value;
+            const location = document.getElementById('register-location').value;
+            const password = document.getElementById('register-password').value;
+            
+            try {
+                const { data, error } = await supabase.auth.signUp({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                // Create user profile
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        { 
+                            id: data.user.id, 
+                            name, 
+                            email, 
+                            phone, 
+                            location 
+                        }
+                    ]);
+                
+                if (profileError) throw profileError;
+                
+                alert('Registration successful! Please check your email for verification.');
+                hideModal(registerModal);
+            } catch (error) {
+                alert('Error during registration: ' + error.message);
+            }
+        }
+        
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                
+                if (error) throw error;
+                
+                currentUser = data.user;
+                updateUIForAuth();
+                loadUserProfile();
+                hideModal(loginModal);
+            } catch (error) {
+                alert('Error during login: ' + error.message);
+            }
+        }
+        
+        async function handleLogout() {
+            try {
+                const { error } = await supabase.auth.signOut();
+                if (error) throw error;
+                
+                currentUser = null;
+                updateUIForUnauth();
+            } catch (error) {
+                alert('Error during logout: ' + error.message);
+            }
+        }
+        
+        // Profile functions
+        async function loadUserProfile() {
+            if (!currentUser) return;
+            
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('*')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) throw error;
+                
+                document.getElementById('profile-avatar').textContent = data.name.charAt(0);
+                document.getElementById('profile-name').textContent = data.name;
+                document.getElementById('profile-location').textContent = data.location || 'Location not set';
+                
+                document.getElementById('name').value = data.name;
+                document.getElementById('email').value = data.email;
+                document.getElementById('phone').value = data.phone || '';
+                document.getElementById('location').value = data.location || '';
+            } catch (error) {
+                console.error('Error loading profile:', error);
+            }
+        }
+        
+        async function handleProfileUpdate(e) {
+            e.preventDefault();
+            if (!currentUser) return;
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            
+            try {
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({ name, email, phone, location })
+                    .eq('id', currentUser.id);
+                
+                if (error) throw error;
+                
+                alert('Profile updated successfully!');
+                loadUserProfile();
+            } catch (error) {
+                alert('Error updating profile: ' + error.message);
+            }
+        }
+        
+        function showProfile(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showModal(loginModal);
+                return;
+            }
+            
+            profileSection.style.display = 'block';
+            resourcesGrid.style.display = 'none';
+            document.getElementById('search-input').style.display = 'none';
+            document.getElementById('search-btn').style.display = 'none';
+        }
+        
+        function showResources(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showModal(loginModal);
+                return;
+            }
+            
+            profileSection.style.display = 'none';
+            resourcesGrid.style.display = 'grid';
+            document.getElementById('search-input').style.display = 'block';
+            document.getElementById('search-btn').style.display = 'block';
+            loadResources();
+        }
+        
+        // Resource functions
+        async function loadResources() {
+            try {
+                const { data, error } = await supabase
+                    .from('resources')
+                    .select('*');
+                
+                if (error) throw error;
+                
+                displayResources(data);
+            } catch (error) {
+                console.error('Error loading resources:', error);
+            }
+        }
+        
+        function displayResources(resources) {
+            resourcesGrid.innerHTML = '';
+            
+            if (resources.length === 0) {
+                resourcesGrid.innerHTML = '<p>No resources found.</p>';
+                return;
+            }
+            
+            resources.forEach(resource => {
+                const resourceCard = document.createElement('div');
+                resourceCard.className = 'resource-card';
+                resourceCard.innerHTML = `
+                    <div class="resource-img">📦</div>
+                    <div class="resource-content">
+                        <h3 class="resource-title">${resource.title}</h3>
+                        <div class="resource-meta">
+                            <span>${resource.location}</span>
+                            <span>${resource.availability}</span>
+                        </div>
+                        <p class="resource-description">${resource.description}</p>
+                        <p class="resource-price">$${resource.price}/hour</p>
+                        <button class="btn btn-primary book-btn" data-id="${resource.id}">Book Now</button>
+                    </div>
+                `;
+                
+                resourcesGrid.appendChild(resourceCard);
+            });
+            
+            // Add event listeners to book buttons
+            document.querySelectorAll('.book-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!currentUser) {
+                        showModal(loginModal);
+                        return;
+                    }
+                    
+                    const resourceId = this.getAttribute('data-id');
+                    const resource = resources.find(r => r.id === resourceId);
+                    openBookingModal(resource);
+                });
+            });
+        }
+        
+        async function handleSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            
+            try {
+                const { data, error } = await supabase
+                    .from('resources')
+                    .select('*');
+                
+                if (error) throw error;
+                
+                const filteredResources = data.filter(resource => 
+                    resource.title.toLowerCase().includes(query) || 
+                    resource.description.toLowerCase().includes(query) ||
+                    resource.location.toLowerCase().includes(query)
+                );
+                
+                displayResources(filteredResources);
+            } catch (error) {
+                console.error('Error searching resources:', error);
+            }
+        }
+        
+        async function handleShareResource(e) {
+            e.preventDefault();
+            if (!currentUser) return;
+            
+            const title = document.getElementById('resource-title').value;
+            const description = document.getElementById('resource-description').value;
+            const price = document.getElementById('resource-price').value;
+            const availability = document.getElementById('resource-availability').value;
+            
+            try {
+                // Get user location from profile
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('location')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                const { error } = await supabase
+                    .from('resources')
+                    .insert([
+                        { 
+                            title, 
+                            description, 
+                            price, 
+                            availability,
+                            location: profile.location,
+                            owner_id: currentUser.id
+                        }
+                    ]);
+                
+                if (error) throw error;
+                
+                alert('Resource shared successfully!');
+                hideModal(shareModal);
+                shareForm.reset();
+                loadResources();
+            } catch (error) {
+                alert('Error sharing resource: ' + error.message);
+            }
+        }
+        
+        // Booking functions
+        function openBookingModal(resource) {
+            selectedResource = resource;
+            
+            document.getElementById('booking-resource-title').textContent = resource.title;
+            document.getElementById('booking-resource-price').textContent = `Price: $${resource.price}/hour`;
+            document.getElementById('booking-resource-availability').textContent = `Available: ${resource.availability}`;
+            
+            showModal(bookingModal);
+        }
+        
+        function handleBooking(e) {
+            e.preventDefault();
+            const date = document.getElementById('booking-date').value;
+            const time = document.getElementById('booking-time').value;
+            const duration = document.getElementById('booking-duration').value;
+            
+            const total = (selectedResource.price * duration).toFixed(2);
+            
+            document.getElementById('payment-total').textContent = total;
+            hideModal(bookingModal);
+            showModal(paymentModal);
+        }
+        
+        function handlePayment(e) {
+            e.preventDefault();
+            alert('Payment processed successfully! Your booking is confirmed.');
+            hideModal(paymentModal);
+            paymentForm.reset();
+            bookingForm.reset();
+        }
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === registerModal) hideModal(registerModal);
+            if (e.target === loginModal) hideModal(loginModal);
+            if (e.target === shareModal) hideModal(shareModal);
+            if (e.target === bookingModal) hideModal(bookingModal);
+            if (e.target === paymentModal) hideModal(paymentModal);
+        });
+    </script>
+</body>
+</html>
